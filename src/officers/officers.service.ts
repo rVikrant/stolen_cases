@@ -23,7 +23,7 @@ export class OfficersService {
 
       delete data['id'];
 
-      await this.officerModel.update(data, { where: criteria });
+      await this.officerModel.update(data, { where: criteria, limit: 1 });
 
       return;
     } catch (e) {

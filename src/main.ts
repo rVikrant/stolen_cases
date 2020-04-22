@@ -11,7 +11,6 @@ async function bootstrap() {
     .setTitle('Stolen Bike Cases')
     .setDescription('The Stolen Bike Cases API description')
     .setVersion('2.0')
-    // .addTag('')
     .build();
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('documentation', app, document);

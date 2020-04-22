@@ -3,7 +3,7 @@ import { Column, Model, Table, CreatedAt, DeletedAt, UpdatedAt, DataType, Index 
 @Table
 export class Officer extends Model<Officer> {
   @Column({autoIncrement: true, primaryKey: true, allowNull: false, unique: true, type: DataType.BIGINT})
-  id: bigint;
+  id: number;
 
   @Index
   @Column({

@@ -1,34 +1,18 @@
-import { Controller, Post, Put, Body } from '@nestjs/common';
+import { ApiTags, ApiBody} from '@nestjs/swagger';
+import { Controller, Post, Put, Body} from '@nestjs/common';
 import { CasesService } from './cases.service';
 import { OfficersService } from '../officers/officers.service';
+import { CreateCaseEntity, CaseToUpdateEntity } from './cases.entity';
 
-interface NewCase {
-  user: number,
-  bikeNo: string,
-  latitude: number,
-  bikeColor: string,
-  longitude: number
-}
-
-interface CaseToUpdate {
-  id: number,
-  bikeNo: string,
-  status: string
-  officer: number,
-  latitude: number,
-  bikeColor: string,
-  longitude: number,
-  isResolved: boolean,
-}
-
-
+@ApiTags('case')
 @Controller('case')
 export class CasesController {
   constructor(private readonly casesService: CasesService, private readonly officersService: OfficersService) {
   }
 
   @Post('create')
-  async create(@Body() newCase: NewCase) {
+  @ApiBody({type: CreateCaseEntity})
+  async create(@Body() createCase: CreateCaseEntity) {
     try {
       console.log('case controller create fn:');
 
@@ -42,9 +26,9 @@ export class CasesController {
         },
       });
 
-      if (officerAvailable && 'id' in officerAvailable) newCase['officer'] = officerAvailable.id;
+      if (officerAvailable && 'id' in officerAvailable) createCase['officer'] = officerAvailable.id;
 
-      newCase = await this.casesService.save(newCase);
+      const newCase = await this.casesService.save(createCase);
 
       if (officerAvailable && 'id' in officerAvailable)
         await this.officersService.update({
@@ -61,14 +45,14 @@ export class CasesController {
   }
 
   @Put('update')
-  async update(@Body() caseToUpdate: CaseToUpdate) {
+  async update(@Body() caseToUpdate: CaseToUpdateEntity) {
     try {
       console.log('case controller update fn:');
 
       await this.casesService.update(caseToUpdate);
 
       if ('isResolved' in caseToUpdate && caseToUpdate.isResolved) {
-        const newCase: CaseToUpdate = await this.casesService.findOne({
+        const newCase = await this.casesService.findOne({
           attributes: ['id'],
           criteria: { isResolved: false, status: 'ACTIVE' },
         });

@@ -27,7 +27,7 @@ export class CasesService {
 
       delete data['id'];
 
-      await this.caseModel.update(data, { where: criteria });
+      await this.caseModel.update(data, { where: criteria, limit: 1 });
 
       return;
     } catch (e) {
