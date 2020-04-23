@@ -1,5 +1,5 @@
-import { ApiTags, ApiBody} from '@nestjs/swagger';
-import { Controller, Post, Put, Body} from '@nestjs/common';
+import { ApiTags} from '@nestjs/swagger';
+import { Controller, Post, Put, Body, BadRequestException} from '@nestjs/common';
 import { CasesService } from './cases.service';
 import { OfficersService } from '../officers/officers.service';
 import { CreateCaseEntity, CaseToUpdateEntity } from './cases.entity';
@@ -11,14 +11,18 @@ export class CasesController {
   }
 
   @Post('create')
-  @ApiBody({type: CreateCaseEntity})
   async create(@Body() createCase: CreateCaseEntity) {
     try {
       console.log('case controller create fn:');
 
+      const res = {
+        status: 200,
+        message: "Your case is registered. An officer will be assigned asap for follow up"
+      };
+
       // find the available officer and assign the case to that officer if available
       const officerAvailable = await this.officersService.findOne({
-        attributes: ['id'],
+        attributes: ['id', 'firstName', 'lastName'],
         criteria: {
           onDuty: true,
           status: 'ACTIVE',
@@ -30,17 +34,19 @@ export class CasesController {
 
       const newCase = await this.casesService.save(createCase);
 
-      if (officerAvailable && 'id' in officerAvailable)
+      if (officerAvailable && 'id' in officerAvailable) {
         await this.officersService.update({
           id: officerAvailable.id,
           isAvailable: false,
         });
+        res.message = `Your case is registered and officer ${officerAvailable.firstName} ${officerAvailable.lastName} has been assigned to your case for follow up`;
+      }
 
-      return newCase;
+      return res;
 
     } catch (e) {
       console.log('error in case controller create fn:', e);
-      throw e;
+      throw new BadRequestException(e);
     }
   }
 
@@ -73,10 +79,13 @@ export class CasesController {
         }
       }
 
-      return {};
+      return {
+        status: 200,
+        message: "Case has been updated."
+      };
     } catch (e) {
       console.log('error in case controller update fn:', e);
-      throw e;
+      throw new BadRequestException(e);
     }
   }
 }

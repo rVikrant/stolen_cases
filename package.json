@@ -28,6 +28,8 @@
     "@nestjs/sequelize": "^0.1.0",
     "@nestjs/swagger": "^4.5.2",
     "@types/dotenv": "^8.2.0",
+    "class-transformer": "^0.2.3",
+    "class-validator": "^0.12.1",
     "dotenv": "^8.2.0",
     "mysql2": "^2.1.0",
     "reflect-metadata": "^0.1.13",

@@ -1,12 +1,22 @@
-import * as dotenv from 'dotenv';
-dotenv.config();
+import * as dotenv from 'dotenv';               // caution: place dotenv always on top of this file
+dotenv.config();                                 // do not comment or change this line
+
+// import in built dependencies
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
+// import local dependencies required
+import { AppModule } from './app.module';
+import { ValidationPipe } from './validation.pipe';
+
 async function bootstrap() {
+  // nest instance init with app module
   const app = await NestFactory.create(AppModule);
 
+  // make validation global for app routes
+  app.useGlobalPipes(new ValidationPipe());
+
+  // swagger init
   const options = new DocumentBuilder()
     .setTitle('Stolen Bike Cases')
     .setDescription('The Stolen Bike Cases API description')

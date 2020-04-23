@@ -1,47 +1,67 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { IsString, IsInt, Min, Max, IsEnum, IsBoolean, IsOptional } from 'class-validator';
 
 // create case entity for api
 export class CreateCaseEntity {
-  @ApiProperty()
+  // @ApiProperty()
+  @IsInt()
+  @Min(1)
   user: number;
 
-  @ApiProperty()
+  // @ApiProperty()
+  @IsString()
   bikeNo: string;
 
-  @ApiProperty()
+  // @ApiProperty()
+  @IsInt()
+  @Min(-90)
+  @Max(90)
   latitude?: number;
 
-  @ApiProperty()
+  // @ApiProperty()
+  @IsString()
   bikeColor: string;
 
-  @ApiProperty()
+  // @ApiProperty()
+  @IsInt()
+  @Min(-180)
+  @Max(180)
   longitude?: number;
 }
 
 
 //  case update
 export class CaseToUpdateEntity {
-  @ApiProperty()
+  @IsInt()
+  @Min(1)
   id: number;
 
-  @ApiProperty({required: false})
-  bikeNo?: string;
+  @IsString()
+  @IsOptional()
+  bikeNo: string;
 
-  @ApiProperty({required: false, enum: ["ACTIVE", "BLOCKED", "DELETED"]})
-  status?: string;
+  @IsEnum({required: false, enum: ["ACTIVE", "BLOCKED", "DELETED"]})
+  @IsOptional()
+  status: string;
 
-  @ApiProperty({required: false})
-  officer?: number;
+  @IsInt()
+  @Min(1)
+  officer: number;
 
-  @ApiProperty({required: false, minimum: -90, maximum: 90})
+  @IsInt()
+  @Min(-90)
+  @Max(90)
+  @IsOptional()
   latitude?: number;
 
-  @ApiProperty({required: false})
+  @IsString()
   bikeColor?: string;
 
-  @ApiProperty({required: false, minimum: -180, maximum: 180})
+  @IsInt()
+  @IsOptional()
+  @Min(-180)
+  @Max(180)
   longitude?: number;
 
-  @ApiProperty({required: false})
-  isResolved?: boolean;
+  @IsBoolean()
+  isResolved: boolean;
 }
