@@ -1,10 +1,10 @@
-import { IsString, IsInt, Min, Max, IsEnum, IsBoolean, IsOptional } from 'class-validator';
+import { IsString, IsInt, Min, Max, IsEnum, IsBoolean, IsOptional, IsPositive } from 'class-validator';
 
 // create case entity for api
 export class CreateCaseEntity {
   // @ApiProperty()
   @IsInt()
-  @Min(1)
+  @IsPositive()
   user: number;
 
   // @ApiProperty()
@@ -32,19 +32,19 @@ export class CreateCaseEntity {
 //  case update
 export class CaseToUpdateEntity {
   @IsInt()
-  @Min(1)
+  @IsPositive()
   id: number;
 
   @IsString()
   @IsOptional()
   bikeNo: string;
 
-  @IsEnum({required: false, enum: ["ACTIVE", "BLOCKED", "DELETED"]})
+  @IsEnum(["ACTIVE", "BLOCKED", "DELETED"])
   @IsOptional()
   status: string;
 
   @IsInt()
-  @Min(1)
+  @IsPositive()
   officer: number;
 
   @IsInt()
