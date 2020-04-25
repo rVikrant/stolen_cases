@@ -3,6 +3,7 @@ import { Controller, Post, Put, Body, BadRequestException} from '@nestjs/common'
 import { CasesService } from './cases.service';
 import { OfficersService } from '../officers/officers.service';
 import { CreateCaseEntity, CaseToUpdateEntity } from './cases.entity';
+import { IsNull } from 'sequelize-typescript';
 
 @ApiTags('case')
 @Controller('case')
@@ -30,11 +31,16 @@ export class CasesController {
         },
       });
 
-      if (officerAvailable && 'id' in officerAvailable) createCase['officer'] = officerAvailable.id;
+      let officer = false;
+
+      if (officerAvailable && 'id' in officerAvailable) {
+        createCase['officer'] = officerAvailable.id;
+        officer = true;
+      }
 
       const newCase = await this.casesService.save(createCase);
 
-      if (officerAvailable && 'id' in officerAvailable) {
+      if (officer) {
         await this.officersService.update({
           id: officerAvailable.id,
           isAvailable: false,
@@ -55,12 +61,17 @@ export class CasesController {
     try {
       console.log('case controller update fn:');
 
+      let res = {
+        status: 200,
+        message: "Case has been updated."
+      };
+
       await this.casesService.update(caseToUpdate);
 
       if ('isResolved' in caseToUpdate && caseToUpdate.isResolved) {
         const newCase = await this.casesService.findOne({
           attributes: ['id'],
-          criteria: { isResolved: false, status: 'ACTIVE' },
+          criteria: { isResolved: false, status: 'ACTIVE', officer: null },
         });
 
         /*
@@ -71,18 +82,23 @@ export class CasesController {
             id: newCase.id,
             officer: caseToUpdate.officer,
           });
+          res = {
+            status: 200,
+            message: "Case has been updated as resolved and a new case is assigned to you. Please look into that."
+          }
         } else {
           await this.officersService.update({
             id: caseToUpdate.officer,
             isAvailable: true,
           });
+          res = {
+            status: 200,
+            message: "Case has been updated as resolved."
+          }
         }
       }
 
-      return {
-        status: 200,
-        message: "Case has been updated."
-      };
+      return res;
     } catch (e) {
       console.log('error in case controller update fn:', e);
       throw new BadRequestException(e);

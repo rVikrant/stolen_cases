@@ -54,6 +54,7 @@ export class CaseToUpdateEntity {
   latitude?: number;
 
   @IsString()
+  @IsOptional()
   bikeColor?: string;
 
   @IsInt()
